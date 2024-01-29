@@ -25,15 +25,14 @@ if __system == "Windows":
 elif __system == "Linux":
     print("当前系统为Linux")
     def init_env():
-        base_dir = os.path.abspath('.')
+        base_dir = os.path.dirname(__file__)
 
-        # 加载Windows 动态库 libjakaAPI.so
-        env_path = os.path.join(base_dir, r'out/shared/libjakaAPI.so')
+        env_path = os.path.join(base_dir, r'./libjakaAPI.so')
         print(env_path)
         ctypes.CDLL(env_path)
         sys.path.append(env_path)
 
-        env_path = os.path.join(base_dir, r'out/shared/jkrc.so')
+        env_path = os.path.join(base_dir, r'./jkrc.so')
         print(env_path)
         ctypes.CDLL(env_path)
         sys.path.append(env_path)
