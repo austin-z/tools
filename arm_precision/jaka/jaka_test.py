@@ -44,8 +44,8 @@ def test1(robot):
 
         time.sleep(0.5)
 
-    save_result("test1_tcp", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result_tcp)
-    save_result("test1_joint", ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'], result_joint)
+    save_result("test1_tcp_jaka", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result_tcp)
+    save_result("test1_joint_jaka", ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'], result_joint)
 
 def test2(robot):
     p0 = get_tcp_position(robot)
@@ -72,7 +72,7 @@ def test2(robot):
             print(i, "diff:", diff)
             result.append(diff)
 
-    save_result("test2_tcp", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result)
+    save_result("test2_tcp_jaka", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result)
 
 def test3():
     p0 = get_joint_position(robot)
@@ -99,7 +99,7 @@ def test3():
             print(i, "diff:", diff)
             result.append(diff)
 
-    save_result("test3_joint", ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'], result)
+    save_result("test3_joint_jaka", ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'], result)
 
 if __name__ == '__main__':
     __common.init_env()
