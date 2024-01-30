@@ -10,10 +10,25 @@ import csv
 ABS = 0
 INCR= 1
 
-def save_result(tag, result):
-    csv_file = tag + ".csv"
+def get_tcp_position(robot):
+    err, tcp = robot.get_tcp_position()
+    if err:
+        print("get_tcp_pos failed:", err)
+        sys.exit()
+    return tcp
+
+def get_joint_position(robot):
+    err, joint = robot.get_joint_position()
+    if err:
+        print("get_joint_position failed:", joint)
+        sys.exit()
+    return joint
+
+def save_result(name, columns, result):
+    csv_file = name + ".csv"
     with open(csv_file, mode='w', newline='') as file:
         writer = csv.writer(file)
+        writer.writerow(columns)
         writer.writerows(result)
 
 def test1():
@@ -24,74 +39,62 @@ def test1():
     result_joint = []
 
     for i in range(0, 100):
-        err, tcp = robot.get_tcp_position()
-        if not err:
-            result_tcp.append(tcp)
-            print("jaka tcp: ", tcp)
-        else:
-            print("get_tcp_pos failed.")
-            sys.exit()
+        tcp = get_tcp_position(robot)
+        result_tcp.append(tcp)
 
-        err, joint = robot.get_joint_position()
-        if not err:
-            result_joint.append(joint)
-            print("jaka joint: ", joint)
-        else:
-            print("get_tcp_pos failed.")
-            sys.exit()
+        joint = get_joint_position(robot)
+        result_joint.append(joint)
 
         time.sleep(0.5)
 
     print("logout: ", robot.logout())
 
-    save_result("test1_tcp", result_tcp)
-    save_result("test1_joint", result_joint)
+    save_result("test1_tcp", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result_tcp)
+    save_result("test1_joint", ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'], result_joint)
 
 def test2():
     robot = jkrc.RC("192.168.0.204")
-    print("login: ", robot.login())
-    #print("power_on: ", rc.power_on())
-    #print("enable_robot: ", rc.enable_robot())
+    print("login:", robot.login())
+    #print("power_on: ", robot.power_on())
+    #print("enable_robot: ", robot.enable_robot())
 
-    ret = robot.get_tcp_position()
-    if not ret[0]:
-        print("get_tcp_pos ok & tcp pos is: ", ret)
-    else:
-        print("get_tcp_pos failed.")
-        sys.exit()
+    p0 = get_tcp_position(robot)
+    p1 = [item + 10 if i < 3 else item + 0.0175 for i, item in enumerate(p0)]
+    print(p0, p1)
 
-    init_pose = current_pose = ret[1]
+    result = []
 
-    for i in range(0, 40):
-        target_pose = current_pose[:]
+    for i in range(0, 100):
         if i % 2 == 0:
-            target_pose[0] += 10
-            target_pose[1] += 10
-            target_pose[2] += 10
+            robot.linear_move(p1, ABS, True, 10)
+            time.sleep(1)
+
+            p = get_tcp_position(robot)
+            diff = [abs(a - b) for a, b in zip(p, p1)]
+            print(i, "diff:", diff)
+            result.append(diff)
         else:
-            target_pose[0] -= 10
-            target_pose[1] -= 10
-            target_pose[2] -= 10
+            robot.linear_move(p0, ABS, True, 10)
+            time.sleep(1)
 
-        robot.linear_move(target_pose, ABS, True, 10)
-        time.sleep(1)
+            p = get_tcp_position(robot)
+            diff = [abs(a - b) for a, b in zip(p0, p)]
+            print(i, "diff:", diff)
+            result.append(diff)
 
-        ret = robot.get_tcp_position()
-        if not ret[0]:
-            current_pose = ret[1]
-            print("get_tcp_pos ok & tcp pos is: {}".format(ret[1]))
-        else:
-            print("get_tcp_pos failed.")
-            sys.exit()
+    #print("disable_robot: ", robot.disable_robot())
+    #print("power_off: ", robot.power_off())
 
-    print("Pose diff(mm):", [a - b for a, b in zip(init_pose, current_pose)])
+    p = get_tcp_position(robot)
+    diff = [abs(a - b) for a, b in zip(p, p0)]
+    print("final diff:", diff)
 
-    #print("disable_robot: ", rc.disable_robot())
-    #print("power_off: ", rc.power_off())
     print("logout: ", robot.logout())
+
+    save_result("test2_tcp", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result)
 
 if __name__ == '__main__':
     __common.init_env()
     import jkrc
 
-    test1()
+    test2()
