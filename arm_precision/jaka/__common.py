@@ -4,47 +4,24 @@ import ctypes
 
 import platform
 
-# 获取当前系统名称
-__system = platform.system()
+def init_env():
+    base_dir = os.path.dirname(__file__)
 
-if __system == "Windows":
-    print("当前系统为Windows")
-    def init_env():
-        base_dir = os.path.abspath('.')
+    env_path = os.path.join(base_dir, r'./libjakaAPI.so')
+    print(env_path)
+    ctypes.CDLL(env_path)
+    sys.path.append(env_path)
 
-        # 指定 Linux 动态库查找路径
-        syspath = os.path.join(base_dir, r'out\python3\Release')
-        sys.path.append(syspath)
+    env_path = os.path.join(base_dir, r'./jkrc.so')
+    print(env_path)
+    ctypes.CDLL(env_path)
+    sys.path.append(env_path)
 
-        # 指定Linux Python jkzuc模块查找路径
-        env_path = os.path.join(base_dir, r'out\shared\Release')
-        path_env = os.environ.get('PATH')
-        path_env = env_path + ';' + path_env
-        os.environ['PATH'] = path_env
-        # print('env: {}'.format(os.environ['PATH']))
-elif __system == "Linux":
-    print("当前系统为Linux")
-    def init_env():
-        base_dir = os.path.dirname(__file__)
-
-        env_path = os.path.join(base_dir, r'./libjakaAPI.so')
-        print(env_path)
-        ctypes.CDLL(env_path)
-        sys.path.append(env_path)
-
-        env_path = os.path.join(base_dir, r'./jkrc.so')
-        print(env_path)
-        ctypes.CDLL(env_path)
-        sys.path.append(env_path)
-
-        # 加载Window Python jkzuc模块查找路径
-        #syspath = os.path.join(base_dir, r'out/shared/jkrc.so') #out/python3
-        #sys.path.append(syspath)
-        # print('SYS PATH: {}\n {}'.format(sys.path, syspath))
-        # print('LD_LIBRARY_PATH: {}'.format(os.environ['LD_LIBRARY_PATH']))
-else:
-    print("未知系统")
-
+    # 加载Window Python jkzuc模块查找路径
+    #syspath = os.path.join(base_dir, r'out/shared/jkrc.so') #out/python3
+    #sys.path.append(syspath)
+    # print('SYS PATH: {}\n {}'.format(sys.path, syspath))
+    # print('LD_LIBRARY_PATH: {}'.format(os.environ['LD_LIBRARY_PATH']))
 
 if __name__ == '__main__':
     init_env()

@@ -42,6 +42,7 @@ def test_idle_read(robot):
         joint = get_joint_position(robot)
         result_joint.append(joint)
 
+        print(tcp, joint)
         time.sleep(0.5)
 
     save_result("test_idle_read_tcp_jaka", ['x', 'y', 'z', 'rx', 'ry', 'rz'], result_tcp)
